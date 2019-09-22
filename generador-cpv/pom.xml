@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>esei.ssi.eperegrino</groupId>
+	<artifactId>generador_cpv</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0</version>
+
+	<parent>
+		<groupId>esei.ssi.eperegrino</groupId>
+		<artifactId>eperegrino</artifactId>
+		<version>1.0</version>
+	</parent>
+
+	<!-- Esta aplicación utiliza clases de otro subproyecto -->
+	<dependencies>
+		<dependency>
+			<groupId>esei.ssi.eperegrino</groupId>
+			<artifactId>common</artifactId>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+
+				<configuration>
+					<archive>
+						<manifest>
+							<!-- Indicar clase principal, para permitir la ejecución del .jar -->
+							<addClasspath>true</addClasspath>
+							<mainClass>esei.ssi.eperegrino.generador_cpv.GeneradorCPV</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
