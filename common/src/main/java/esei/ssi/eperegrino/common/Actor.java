@@ -131,6 +131,7 @@ public enum Actor {
 		if (clavePublica == null) {
 			throw new IllegalArgumentException("La clave pública a establecer no puede ser nula");
 		}
+		
 		setClavePublica(new X509EncodedKeySpec(clavePublica));
 	}
 
