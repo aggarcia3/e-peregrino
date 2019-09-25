@@ -30,7 +30,7 @@ public final class GestorProveedoresJCA {
 	 */
 	private static void addProviderIfNotRegistered(final Provider p) {
 		if (getProvider(p.getName()) != null) {
-			addProvider(Actor.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
+			addProvider(p);
 		}
 	}
 }
