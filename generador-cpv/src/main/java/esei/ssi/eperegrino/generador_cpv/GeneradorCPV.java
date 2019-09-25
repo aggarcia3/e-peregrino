@@ -1,56 +1,129 @@
 package esei.ssi.eperegrino.generador_cpv;
 
-import esei.ssi.eperegrino.common.Bloque;
+import esei.ssi.eperegrino.common.Actor;
 
-import java.io.File;
+import esei.ssi.eperegrino.common.GestorProveedoresJCA;
+import esei.ssi.eperegrino.common.JSONUtils;
+import esei.ssi.eperegrino.common.Paquete;
+import esei.ssi.eperegrino.common.PaqueteDAO;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
 final class GeneradorCPV {
+	public static final String TITULO_BLOQUE_DATOS_PEREGRINO = "DATOS PEREGRINO";
+	public static final String TITULO_BLOQUE_CLAVE_DATOS = "CLAVE DATOS PEREGRINO";
+	public static final String TITULO_BLOQUE_RESUMEN_DATOS_ENCRIPTADO = "DATOS ENCRIPTADOS";
+
 	// Argumentos de línea de comandos: <nombre paquete> <ficheros con las claves necesarias>  
 	public static void main(final String[] args) {
 		/* TODO: pedir datos por entrada estándar para crear un Map<String, String>.
-		 * Manejar errores que puedan surgir en el proceso, mostrándolos al usuario */
+		 * Manejar errores que puedan surgir en el proceso, mostrándolos al usuario.
+		 * Asociar a cada actor los bytes que representan cada una de sus claves necesarias. */
+
 		// try {
 		// 	generarPaquete(...);
 		// } catch (Exception exc) { ... }
+
+		// Código de ejemplo que hice para leer eficientemente el fichero de entrada
+		// con la clave:
+
+//		final InputStream datosClaveInputStream = new FileInputStream("clave");
+//		final byte[] bufer = new byte[4 * 1024]; // 4 KiB es normalmente el tamaño de un clúster de disco o página de memoria
+//		byte[] bytesClave;
+//
+//		// Leemos el fichero completo en bloques (normalmente es más eficiente que leerlo byte a byte)
+//		int bytesLeidosIter;
+//		while ((bytesLeidosIter = datosClavePublicaOficina.read(bufer, 0, bufer.length)) > 0) {
+//			// Se añade una copia del búfer porque puede no haberse llenado.
+//			// La clase Arrays usada a continuación está en el paquete org.bouncycastle.util
+//			bytesClave = Arrays.concatenate(bytesClave, Arrays.copyOf(bufer, bytesLeidosIter));
+//		}
+//
+//		// bytesClave contiene a partir de esta línea los bytes leídos del InputStream
+//		// hasta que señalizó el fin de fichero. Pueden asociarse esos bytes con el actor:
+//		Actor.PEREGRINO.setClavePublica(bytesClave);
 	}
 
-	private static final class FicherosClave {
-		private final File ficheroClavePublicaOficina;
-		private final File ficheroClavePrivadaPeregrino;
+	/**
+	 * Genera el paquete inicial de la CPV, conteniendo los datos del peregrino, y lo guarda a disco
+	 * cumpliendo los requisitos de seguridad de la información estipulados.
+	 * @param datos Los pares clave-valor de datos que conformarán un bloque del paquete. Pueden experimentar
+	 * pérdida de información si las cadenas de texto contienen algún caracter reservado para la codificación
+	 * JSON. Véase el método {@link esei.ssi.eperegrino.common.JSONUtils.map2json}.
+	 * @param flujoSalidaPaquete El flujo a donde guardar el paquete resultante.
+	 * @throws IllegalArgumentException Si algún parámetro recibido no es válido.
+	 * @throws GeneralSecurityException Si ocurre algún error relacionado con las operaciones criptográficas
+	 * que no haya sido manejado por un tipo de excepción más específico.
+	 * @throws InvalidKeySpecException Si alguna de las claves asociadas a los actores no se ha podido interpretar
+	 * correctamente como tal.
+	 * @throws IOException Si ocurre algún error de E/S durante el generado del paquete.
+	 * @author Alejandro González García
+	 */
+	static void generarPaqueteCPV(final Map<String, String> datos, final OutputStream flujoSalidaPaquete)
+			throws GeneralSecurityException, InvalidKeySpecException, IOException
+	{
+		KeyGenerator generadorClaveCifradorSimetrico;
+		SecretKey claveCifrador;
+		Cipher cifradorSimetrico, cifradorAsimetrico;
+		byte[] datosEncriptados, claveCifradorEncriptada, resumenEncriptadoDatos;
+		Paquete paqueteCpv;
 
-		FicherosClave(final File ficheroClavePublicaOficina, final File ficheroClavePrivadaPeregrino) {
-			if (ficheroClavePrivadaPeregrino == null || ficheroClavePublicaOficina == null) {
-				throw new IllegalArgumentException();
-			}
-
-			this.ficheroClavePrivadaPeregrino = ficheroClavePrivadaPeregrino;
-			this.ficheroClavePublicaOficina = ficheroClavePublicaOficina;
+		if (datos == null || flujoSalidaPaquete == null) {
+			throw new IllegalArgumentException("Un parámetro recibido para generar el paquete de la CPV es nulo, y no debería de serlo");
 		}
 
-		File getFicheroClavePublicaOficina() {
-			return ficheroClavePublicaOficina;
-		}
+		// Registrar los proveedores JCA que usaremos
+		GestorProveedoresJCA.registrarProveedores();
 
-		File getFicheroClavePrivadaPeregrino() {
-			return ficheroClavePrivadaPeregrino;
-		}
-	}
+		// Generar una clave aleatoria para un cifrado simétrico AES con
+		// un PRNG implementado por Bouncy Castle
+		generadorClaveCifradorSimetrico = KeyGenerator.getInstance(Actor.ALGORITMO_GENERADOR_CLAVES_SIMETRICO, Actor.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
+		generadorClaveCifradorSimetrico.init(256);
+		claveCifrador = generadorClaveCifradorSimetrico.generateKey();
 
-	private static void generarPaquete(final Map<String, String> datos, final File paquete, final FicherosClave ficherosClave) throws Exception {
-		/* TODO:
-		 * convertir mapa a cadena JSON (JSONUtils.map2json), cadena JSON a bytes
-		 * en UTF-8 (getBytes(Charset.forName("UTF-8"))).
-		 * Para la confidencialidad:
-		 * 1. generar clave aleatoria,
-		 * 2. encriptar cadena JSON con simétrico,
-		 * 3. encriptar clave aleatoria con asimétrico (usando clave pública de la oficina),
-		 * 4. meter resultado de 2 en bloque llamado "DATOS PEREGRINO",
-		 * 5. meter resultado de 3 en bloque llamado "CLAVE DATOS PEREGRINO".
-		 * Para la autenticidad y no repudio (firma digital):
-		 * 1. calcular hash del resultado del punto 2 anterior,
-		 * 2. encriptar hash con RSA (usando clave privada del peregrino),
-		 * 3. meter resultado de 2 en bloque "FIRMA PEREGRINO".
-		 */
+		// Inicializar algoritmo AES en modo Cipher Block Chaining (un poco más confidencial que ECB)
+		cifradorSimetrico = Cipher.getInstance(Actor.ALGORITMO_SIMETRICO, Actor.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
+		cifradorSimetrico.init(Cipher.ENCRYPT_MODE, claveCifrador);
+
+		// Inicializar algoritmo RSA
+		cifradorAsimetrico = Cipher.getInstance(Actor.ALGORITMO_ASIMETRICO, Actor.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
+		cifradorAsimetrico.init(Cipher.ENCRYPT_MODE, Actor.OFICINA_PEREGRINO.getClavePublica());
+
+		// Generar la representación encriptada con AES y la clave anterior de los pares de datos en JSON
+		datosEncriptados = cifradorSimetrico.doFinal(JSONUtils.map2json(datos).getBytes(StandardCharsets.UTF_8));
+
+		// Generar la representación encriptada con RSA de la clave usada para el cifrador simétrico
+		claveCifradorEncriptada = cifradorAsimetrico.doFinal(claveCifrador.getEncoded());
+
+		// Encriptar el resumen de los datos encriptados con la clave privada del peregrino,
+		// usando RSA. De esta manera garantizamos que fue el peregrino quien generó este paquete
+		// (firma digital)
+		cifradorAsimetrico.init(Cipher.ENCRYPT_MODE, Actor.PEREGRINO.getClavePrivada());
+		resumenEncriptadoDatos = cifradorAsimetrico.doFinal(
+				MessageDigest.getInstance(
+						Actor.ALGORITMO_RESUMEN, Actor.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS
+				).digest(datosEncriptados)
+		);
+
+		// Se crea el paquete inicial con 3 bloques: los datos del peregrino encriptados con un cifrador
+		// simétrico, la clave de los datos encriptada con un cifrador asimétrico, y el resumen encriptado
+		// con un cifrador asimétrico de los datos encriptados
+		paqueteCpv = new Paquete();
+		paqueteCpv.anadirBloque(TITULO_BLOQUE_DATOS_PEREGRINO, datosEncriptados);
+		paqueteCpv.anadirBloque(TITULO_BLOQUE_CLAVE_DATOS, claveCifradorEncriptada);
+		paqueteCpv.anadirBloque(TITULO_BLOQUE_RESUMEN_DATOS_ENCRIPTADO, resumenEncriptadoDatos);
+
+		// Finalmente, escribir el paquete al flujo
+		PaqueteDAO.escribirPaquete(flujoSalidaPaquete, paqueteCpv);
 	}
 }
