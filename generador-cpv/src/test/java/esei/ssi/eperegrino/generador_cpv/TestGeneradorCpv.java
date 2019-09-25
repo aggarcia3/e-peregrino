@@ -15,8 +15,8 @@ import esei.ssi.eperegrino.common.GestorProveedoresJCA;
 import junit.framework.TestCase;
 
 /**
- * La batería de tests de JUnit a ejecutar sobre la clase
- * GeneradorCpv.
+ * La batería de tests de JUnit a ejecutar sobre la clase GeneradorCpv.
+ * 
  * @author Alejandro González García
  */
 public class TestGeneradorCpv extends TestCase {
@@ -50,15 +50,16 @@ public class TestGeneradorCpv extends TestCase {
 		} catch (final NoSuchAlgorithmException exc) {
 			throw new AssertionError(exc);
 		}
-        generadorClaves.initialize(4096);
+		generadorClaves.initialize(4096);
 
-        // Generar claves aleatorias para probar los casos de uso
-        this.clavePublicaOficinaPeregrino = generadorClaves.generateKeyPair().getPublic().getEncoded();
-        this.clavePrivadaPeregrino = generadorClaves.generateKeyPair().getPrivate().getEncoded();
+		// Generar claves aleatorias para probar los casos de uso
+		this.clavePublicaOficinaPeregrino = generadorClaves.generateKeyPair().getPublic().getEncoded();
+		this.clavePrivadaPeregrino = generadorClaves.generateKeyPair().getPrivate().getEncoded();
 	}
 
 	/**
-	 * Comprueba que la generación de un paquete de CPV con datos válidos no lance excepciones.
+	 * Comprueba que la generación de un paquete de CPV con datos válidos no lance
+	 * excepciones.
 	 */
 	@Test
 	public void testGenerarPaqueteCpv() throws Exception {
@@ -69,7 +70,8 @@ public class TestGeneradorCpv extends TestCase {
 
 		GeneradorCPV.generarPaqueteCPV(datos, os);
 
-		System.out.println("> Generación del paquete de CPV finalizada en " + (System.currentTimeMillis() - inicio) + " ms");
+		System.out.println(
+				"> Generación del paquete de CPV finalizada en " + (System.currentTimeMillis() - inicio) + " ms");
 	}
 
 	/**
@@ -91,8 +93,8 @@ public class TestGeneradorCpv extends TestCase {
 	}
 
 	/**
-	 * Comprueba que la generación de un paquete de CPV con datos inválidos
-	 * lance las excepciones definidas en el contrato.
+	 * Comprueba que la generación de un paquete de CPV con datos inválidos lance
+	 * las excepciones definidas en el contrato.
 	 */
 	@Test
 	public void testGenerarPaqueteCpvParametrosInvalidos() {
