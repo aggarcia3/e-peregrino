@@ -1,5 +1,7 @@
 package esei.ssi.eperegrino.generador_cpv;
 
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.security.KeyPairGenerator;
@@ -12,33 +14,32 @@ import org.junit.Test;
 
 import esei.ssi.eperegrino.common.Actor;
 import esei.ssi.eperegrino.common.GestorProveedoresJCA;
-import junit.framework.TestCase;
+import esei.ssi.eperegrino.common.ParametrosCriptograficos;
 
 /**
  * La batería de tests de JUnit a ejecutar sobre la clase GeneradorCpv.
  * 
  * @author Alejandro González García
  */
-public class TestGeneradorCpv extends TestCase {
+public class TestGeneradorCpv {
 	/**
 	 * Una clave pública generada aleatoriamente.
 	 */
-	private byte[] clavePublicaOficinaPeregrino;
+	private static final byte[] clavePublicaOficinaPeregrino;
 	/**
 	 * Una clave privada generada aleatoriamente.
 	 */
-	private byte[] clavePrivadaPeregrino;
+	private static final byte[] clavePrivadaPeregrino;
 	/**
 	 * Unos pares de datos clave-valor a probar su conversión.
 	 */
-	private final Map<String, String> datos = new HashMap<>();
+	private static final Map<String, String> datos = new HashMap<>();
 	/**
 	 * Un flujo de salida para recoger los resultados de las pruebas.
 	 */
-	private final OutputStream os = new ByteArrayOutputStream();
+	private static final OutputStream os = new ByteArrayOutputStream();
 
-	@Override
-	public void setUp() {
+	static {
 		// Inicializar pares clave-valor
 		datos.put("Nombre", "Alejandro");
 
@@ -46,15 +47,15 @@ public class TestGeneradorCpv extends TestCase {
 
 		KeyPairGenerator generadorClaves;
 		try {
-			generadorClaves = KeyPairGenerator.getInstance("RSA", Actor.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
+			generadorClaves = KeyPairGenerator.getInstance(ParametrosCriptograficos.ALGORITMO_GENERADOR_CLAVES_ASIMETRICO, ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
 		} catch (final NoSuchAlgorithmException exc) {
 			throw new AssertionError(exc);
 		}
-		generadorClaves.initialize(4096);
+		generadorClaves.initialize(4096); // Clave grande para evitar problemas de longitud insuficiente en tests
 
 		// Generar claves aleatorias para probar los casos de uso
-		this.clavePublicaOficinaPeregrino = generadorClaves.generateKeyPair().getPublic().getEncoded();
-		this.clavePrivadaPeregrino = generadorClaves.generateKeyPair().getPrivate().getEncoded();
+		clavePublicaOficinaPeregrino = generadorClaves.generateKeyPair().getPublic().getEncoded();
+		clavePrivadaPeregrino = generadorClaves.generateKeyPair().getPrivate().getEncoded();
 	}
 
 	/**
@@ -70,8 +71,7 @@ public class TestGeneradorCpv extends TestCase {
 
 		GeneradorCPV.generarPaqueteCPV(datos, os);
 
-		System.out.println(
-				"> Generación del paquete de CPV finalizada en " + (System.currentTimeMillis() - inicio) + " ms");
+		System.out.println("> Generación del paquete de CPV finalizada en " + (System.currentTimeMillis() - inicio) + " ms");
 	}
 
 	/**

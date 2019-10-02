@@ -3,14 +3,11 @@ package esei.ssi.eperegrino.common;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * Modela un actor implicado en los casos de uso de
@@ -30,37 +27,6 @@ public enum Actor {
 	 * El actor Oficina del Peregrino.
 	 */
 	OFICINA_PEREGRINO;
-
-	/**
-	 * El algoritmo a emplear en conjunción con las claves
-	 * de los actores.
-	 */
-	public static final String ALGORITMO_ASIMETRICO = "RSA/NONE/OAEPWithSHA512AndMGF1Padding";
-	/**
-	 * El algoritmo para el que generar claves asimétricas.
-	 */
-	public static final String ALGORITMO_GENERADOR_CLAVES_ASIMETRICO = "RSA";
-	/**
-	 * El algoritmo a emplear para codificar datos de manera
-	 * simétrica, empleando una única clave.
-	 */
-	public static final String ALGORITMO_SIMETRICO = "AES/CTR/NoPadding"; // Counter es un poco más confidencial que ECB
-	/**
-	 * El algoritmo para el que generar claves simétricas.
-	 */
-	public static final String ALGORITMO_GENERADOR_CLAVES_SIMETRICO = "AES";
-	/**
-	 * El algoritmo de resumen a emplear para obtener un resumen
-	 * criptográfico (hash) de los datos, cuando sea necesario.
-	 */
-	public static final String ALGORITMO_RESUMEN = "SHA-512";
-	/**
-	 * El proveedor de los algoritmos a emplear para realizar
-	 * operaciones criptográficas. Los usuarios de esta variable
-	 * pueden asumir que el proveedor ya ha sido registrado con
-	 * la JCA.
-	 */
-	public static final Provider PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS = new BouncyCastleProvider();
 
 	/**
 	 * La clave privada del actor.
@@ -151,7 +117,7 @@ public enum Actor {
 		}
 
 		try {
-			return KeyFactory.getInstance(ALGORITMO_GENERADOR_CLAVES_ASIMETRICO, PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS).generatePrivate(clavePrivada);
+			return KeyFactory.getInstance(ParametrosCriptograficos.ALGORITMO_GENERADOR_CLAVES_ASIMETRICO, ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS).generatePrivate(clavePrivada);
 		} catch (final NoSuchAlgorithmException exc) {
 			throw new AssertionError("Se han violado invariantes en la implementación del programa");
 		}
@@ -173,7 +139,7 @@ public enum Actor {
 		}
 
 		try {
-			return KeyFactory.getInstance(ALGORITMO_GENERADOR_CLAVES_ASIMETRICO, PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS).generatePublic(clavePublica);
+			return KeyFactory.getInstance(ParametrosCriptograficos.ALGORITMO_GENERADOR_CLAVES_ASIMETRICO, ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS).generatePublic(clavePublica);
 		} catch (final NoSuchAlgorithmException exc) {
 			throw new AssertionError("Se han violado invariantes en la implementación del programa");
 		}

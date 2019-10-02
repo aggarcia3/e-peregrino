@@ -21,7 +21,7 @@ public final class GestorProveedoresJCA {
 	 * iniciarse la aplicación.
 	 */
 	public static void registrarProveedores() {
-		addProviderIfNotRegistered(Actor.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
+		addProviderIfNotRegistered(ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
 	}
 
 	/**
