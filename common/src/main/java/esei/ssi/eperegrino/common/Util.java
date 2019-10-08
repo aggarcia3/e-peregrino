@@ -14,7 +14,7 @@ public final class Util {
 	/**
 	 * Pide interactivamente un fichero al usuario. Se asume que los parámetros de
 	 * entrada son no nulos.
-	 * 
+	 *
 	 * @param mensaje     El mensaje a mostrar el usuario.
 	 * @param in          La entrada de datos del usuario.
 	 * @param out         La salida de texto al usuario.

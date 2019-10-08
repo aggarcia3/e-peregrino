@@ -10,8 +10,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
- * Modela un actor implicado en los casos de uso de
- * e-peregrino.
+ * Modela un actor implicado en los casos de uso de e-peregrino.
+ *
  * @author Alejandro González García
  */
 public enum Actor {
@@ -38,10 +38,11 @@ public enum Actor {
 	private EncodedKeySpec clavePublica = null;
 
 	/**
-	 * Establece la clave privada del actor, a partir de su especificación
-	 * de codificación correspondiente.
+	 * Establece la clave privada del actor, a partir de su especificación de
+	 * codificación correspondiente.
+	 *
 	 * @param clavePrivada El objeto EncodedKeySpec que encapsula la representación
-	 * codificada de la clave privada.
+	 *                     codificada de la clave privada.
 	 * @throws IllegalArgumentException Si la clave privada a establecer es nula.
 	 */
 	public final void setClavePrivada(final EncodedKeySpec clavePrivada) {
@@ -53,12 +54,12 @@ public enum Actor {
 	}
 
 	/**
-	 * Establece la clave privada del actor a partir de los bytes que componen
-	 * su clave privada, representados en la codificación PKCS8. Normalmente,
-	 * esta es la codificación usada por defecto para guardar claves privadas
-	 * en ficheros.
-	 * @param clavePrivada Los bytes que conforman la representación PKCS8 de
-	 * la clave privada.
+	 * Establece la clave privada del actor a partir de los bytes que componen su
+	 * clave privada, representados en la codificación PKCS8. Normalmente, esta es
+	 * la codificación usada por defecto para guardar claves privadas en ficheros.
+	 *
+	 * @param clavePrivada Los bytes que conforman la representación PKCS8 de la
+	 *                     clave privada.
 	 * @throws IllegalArgumentException Si la clave privada a establecer es nula.
 	 */
 	public final void setClavePrivada(final byte[] clavePrivada) {
@@ -70,10 +71,11 @@ public enum Actor {
 	}
 
 	/**
-	 * Establece la clave pública del actor, a partir de su especificación
-	 * de codificación correspondiente.
+	 * Establece la clave pública del actor, a partir de su especificación de
+	 * codificación correspondiente.
+	 *
 	 * @param clavePrivada El objeto EncodedKeySpec que encapsula la representación
-	 * codificada de la clave pública.
+	 *                     codificada de la clave pública.
 	 * @throws IllegalArgumentException Si la clave pública a establecer es nula.
 	 */
 	public final void setClavePublica(final EncodedKeySpec clavePublica) {
@@ -85,12 +87,13 @@ public enum Actor {
 	}
 
 	/**
-	 * Establece la clave pública del actor a partir de los bytes que componen
-	 * su clave pública, representados en la codificación X509 (ASN.1). Normalmente,
-	 * esta es la codificación usada por defecto para guardar claves públicas
-	 * en ficheros.
+	 * Establece la clave pública del actor a partir de los bytes que componen su
+	 * clave pública, representados en la codificación X509 (ASN.1). Normalmente,
+	 * esta es la codificación usada por defecto para guardar claves públicas en
+	 * ficheros.
+	 *
 	 * @param clavePrivada Los bytes que conforman la representación X509 (ASN.1) de
-	 * la clave pública.
+	 *                     la clave pública.
 	 * @throws IllegalArgumentException Si la clave pública a establecer es nula.
 	 */
 	public final void setClavePublica(final byte[] clavePublica) {
@@ -102,14 +105,16 @@ public enum Actor {
 	}
 
 	/**
-	 * Obtiene el objeto PrivateKey que encapsula de manera opaca la clave privada del actor.
-	 * Es necesario haberle asociado previamente una representación de la clave
-	 * privada.
+	 * Obtiene el objeto PrivateKey que encapsula de manera opaca la clave privada
+	 * del actor. Es necesario haberle asociado previamente una representación de la
+	 * clave privada.
+	 *
 	 * @return La devandicha clave privada.
-	 * @throws IllegalStateException Si no se ha asociado una clave privada al actor
-	 * todavía.
-	 * @throws InvalidKeySpecException Si no se ha podido interpretar la codificación
-	 * de la clave privada como una clave privada.
+	 * @throws IllegalStateException   Si no se ha asociado una clave privada al
+	 *                                 actor todavía.
+	 * @throws InvalidKeySpecException Si no se ha podido interpretar la
+	 *                                 codificación de la clave privada como una
+	 *                                 clave privada.
 	 */
 	public final PrivateKey getClavePrivada() throws InvalidKeySpecException {
 		if (clavePrivada == null) {
@@ -124,14 +129,16 @@ public enum Actor {
 	}
 
 	/**
-	 * Obtiene el objeto PublicKey que encapsula de manera opaca la clave pública del actor.
-	 * Es necesario haberle asociado previamente una representación de la clave
-	 * pública.
+	 * Obtiene el objeto PublicKey que encapsula de manera opaca la clave pública
+	 * del actor. Es necesario haberle asociado previamente una representación de la
+	 * clave pública.
+	 *
 	 * @return La devandicha clave pública.
-	 * @throws IllegalStateException Si no se ha asociado una clave pública al actor
-	 * todavía.
-	 * @throws InvalidKeySpecException Si no se ha podido interpretar la codificación
-	 * de la clave pública como una clave privada.
+	 * @throws IllegalStateException   Si no se ha asociado una clave pública al
+	 *                                 actor todavía.
+	 * @throws InvalidKeySpecException Si no se ha podido interpretar la
+	 *                                 codificación de la clave pública como una
+	 *                                 clave privada.
 	 */
 	public final PublicKey getClavePublica() throws InvalidKeySpecException {
 		if (clavePublica == null) {

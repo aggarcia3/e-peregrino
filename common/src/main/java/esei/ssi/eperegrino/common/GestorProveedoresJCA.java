@@ -6,8 +6,8 @@ import static java.security.Security.getProvider;
 import java.security.Provider;
 
 /**
- * Proporciona funcionalidades comunes de gestión de proveedores
- * de JCA.
+ * Proporciona funcionalidades comunes de gestión de proveedores de JCA.
+ *
  * @author Alejandro González García
  */
 public final class GestorProveedoresJCA {
@@ -16,9 +16,8 @@ public final class GestorProveedoresJCA {
 	}
 
 	/**
-	 * Registra en la JCA los proveedores que empleará el sistema.
-	 * Este método debe de ejecutarse una sola vez poco después de
-	 * iniciarse la aplicación.
+	 * Registra en la JCA los proveedores que empleará el sistema. Este método debe
+	 * de ejecutarse una sola vez poco después de iniciarse la aplicación.
 	 */
 	public static void registrarProveedores() {
 		addProviderIfNotRegistered(ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
@@ -26,6 +25,7 @@ public final class GestorProveedoresJCA {
 
 	/**
 	 * Añade un proveedor de JCA solo si no ha sido ya añadido.
+	 *
 	 * @param p El proveedor a añadir. Se asume que no es nulo.
 	 */
 	private static void addProviderIfNotRegistered(final Provider p) {
