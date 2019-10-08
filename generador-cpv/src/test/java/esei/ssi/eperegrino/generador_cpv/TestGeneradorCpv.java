@@ -1,9 +1,9 @@
 package esei.ssi.eperegrino.generador_cpv;
 
-import static org.junit.Assert.fail;
-
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.security.GeneralSecurityException;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -67,43 +67,27 @@ public class TestGeneradorCpv {
 		Actor.OFICINA_PEREGRINO.setClavePublica(clavePublicaOficinaPeregrino);
 		Actor.PEREGRINO.setClavePrivada(clavePrivadaPeregrino);
 
-		long inicio = System.currentTimeMillis();
-
 		GeneradorCPV.generarPaqueteCPV(datos, os);
-
-		System.out.println("> Generación del paquete de CPV finalizada en " + (System.currentTimeMillis() - inicio) + " ms");
 	}
 
 	/**
 	 * Comprueba que la generación de un paquete de CPV con claves de actores
 	 * inválidas no tenga éxito.
 	 */
-	@Test
-	public void testGenerarPaqueteCpvClavesInvalidas() {
+	@Test(expected = InvalidKeySpecException.class)
+	public void testGenerarPaqueteCpvClavesInvalidas() throws InvalidKeySpecException, GeneralSecurityException, IOException {
 		Actor.OFICINA_PEREGRINO.setClavePublica(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 });
 		Actor.PEREGRINO.setClavePrivada(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 });
 
-		try {
-			GeneradorCPV.generarPaqueteCPV(datos, os);
-		} catch (final InvalidKeySpecException exc) {
-			// Es la excepción que debería de lanzar
-		} catch (final Exception exc) {
-			fail("No se ha lanzado la excepción esperada al asociar claves inválidas a los actores");
-		}
+		GeneradorCPV.generarPaqueteCPV(datos, os);
 	}
 
 	/**
 	 * Comprueba que la generación de un paquete de CPV con datos inválidos lance
 	 * las excepciones definidas en el contrato.
 	 */
-	@Test
-	public void testGenerarPaqueteCpvParametrosInvalidos() {
-		try {
-			GeneradorCPV.generarPaqueteCPV(null, null);
-		} catch (final IllegalArgumentException exc) {
-			// Es la excepción que debería de lanzar
-		} catch (final Exception exc) {
-			fail("No se ha lanzado la excepción esperada al recibir parámetros de entrada inválidos");
-		}
+	@Test(expected = IllegalArgumentException.class)
+	public void testGenerarPaqueteCpvParametrosInvalidos() throws InvalidKeySpecException, GeneralSecurityException, IOException {
+		GeneradorCPV.generarPaqueteCPV(null, null);
 	}
 }
