@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>generador_cpv</artifactId>
+	<artifactId>desempaquetador_cpv</artifactId>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -34,7 +34,7 @@
 						<manifest>
 							<!-- Indicar clase principal, para permitir la ejecución del .jar -->
 							<addClasspath>true</addClasspath>
-							<mainClass>esei.ssi.eperegrino.generador_cpv.GeneradorCpv</mainClass>
+							<mainClass>esei.ssi.eperegrino.desempaquetador_cpv.DesempaquetadorCpv</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

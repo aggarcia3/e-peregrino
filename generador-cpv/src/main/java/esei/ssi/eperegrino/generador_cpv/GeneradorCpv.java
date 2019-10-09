@@ -35,7 +35,7 @@ import static esei.ssi.eperegrino.common.Util.pedirFichero;
  *
  * @author Alejandro González García
  */
-final class GeneradorCPV {
+final class GeneradorCpv {
 	public static final String TITULO_BLOQUE_DATOS_PEREGRINO = "DATOS PEREGRINO";
 	public static final String TITULO_BLOQUE_CLAVE_DATOS = "CLAVE DATOS PEREGRINO";
 	public static final String TITULO_BLOQUE_RESUMEN_DATOS_ENCRIPTADO = "DATOS ENCRIPTADOS";

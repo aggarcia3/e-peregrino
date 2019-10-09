@@ -2,26 +2,31 @@ package esei.ssi.eperegrino.generador_cpv;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.junit.Test;
 
 import esei.ssi.eperegrino.common.Actor;
 import esei.ssi.eperegrino.common.GestorProveedoresJCA;
+import esei.ssi.eperegrino.common.PaqueteDAO;
 import esei.ssi.eperegrino.common.ParametrosCriptograficos;
+
+import static org.hamcrest.text.StringContainsInOrder.stringContainsInOrder;
+import static org.junit.Assert.assertThat;
 
 /**
  * La batería de tests de JUnit a ejecutar sobre la clase GeneradorCpv.
  * 
  * @author Alejandro González García
  */
-public class TestGeneradorCpv {
+public final class TestGeneradorCpv {
 	/**
 	 * Una clave pública generada aleatoriamente.
 	 */
@@ -37,7 +42,7 @@ public class TestGeneradorCpv {
 	/**
 	 * Un flujo de salida para recoger los resultados de las pruebas.
 	 */
-	private static final OutputStream os = new ByteArrayOutputStream();
+	private static final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
 	static {
 		// Inicializar pares clave-valor
@@ -67,7 +72,22 @@ public class TestGeneradorCpv {
 		Actor.OFICINA_PEREGRINO.setClavePublica(clavePublicaOficinaPeregrino);
 		Actor.PEREGRINO.setClavePrivada(clavePrivadaPeregrino);
 
-		GeneradorCPV.generarPaqueteCPV(datos, os);
+		GeneradorCpv.generarPaqueteCPV(datos, bos);
+
+		// Un paquete aparentemente bien formado, con tres bloques
+		assertThat(
+			bos.toString(StandardCharsets.UTF_8.displayName()),
+			stringContainsInOrder(
+				PaqueteDAO.INICIO_PAQUETE,
+				PaqueteDAO.INICIO_BLOQUE,
+				PaqueteDAO.FIN_BLOQUE,
+				PaqueteDAO.INICIO_BLOQUE,
+				PaqueteDAO.FIN_BLOQUE,
+				PaqueteDAO.INICIO_BLOQUE,
+				PaqueteDAO.FIN_BLOQUE,
+				PaqueteDAO.FIN_PAQUETE
+			)
+		);
 	}
 
 	/**
@@ -76,10 +96,15 @@ public class TestGeneradorCpv {
 	 */
 	@Test(expected = InvalidKeySpecException.class)
 	public void testGenerarPaqueteCpvClavesInvalidas() throws InvalidKeySpecException, GeneralSecurityException, IOException {
-		Actor.OFICINA_PEREGRINO.setClavePublica(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 });
-		Actor.PEREGRINO.setClavePrivada(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 });
+		final byte[] claveInvalidaAleatoria = new byte[8];
+		final Random rng = new Random();
 
-		GeneradorCPV.generarPaqueteCPV(datos, os);
+		rng.nextBytes(claveInvalidaAleatoria);
+		Actor.OFICINA_PEREGRINO.setClavePublica(claveInvalidaAleatoria);
+		rng.nextBytes(claveInvalidaAleatoria);
+		Actor.PEREGRINO.setClavePrivada(claveInvalidaAleatoria);
+
+		GeneradorCpv.generarPaqueteCPV(datos, bos);
 	}
 
 	/**
@@ -88,6 +113,6 @@ public class TestGeneradorCpv {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testGenerarPaqueteCpvParametrosInvalidos() throws InvalidKeySpecException, GeneralSecurityException, IOException {
-		GeneradorCPV.generarPaqueteCPV(null, null);
+		GeneradorCpv.generarPaqueteCPV(null, null);
 	}
 }
