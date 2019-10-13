@@ -73,6 +73,7 @@ final class GeneradorCpv {
 			System.out.print("Indique su motivación: ");
 			motivacion = teclado.nextLine();
 
+			// FIXME: leer de argumentos de línea de comandos en lugar de pedir interactivamente
 			bytesClavePublicaOficinaPeregrino = pedirFichero("Escriba la ruta al fichero con la clave pública de la oficina del peregrino", teclado, System.out, true);
 
 			bytesClavePrivadaPeregrino = pedirFichero("Escriba la ruta al fichero con la clave privada del peregrino", teclado, System.out, true);
