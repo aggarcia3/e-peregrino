@@ -23,7 +23,8 @@ public final class ParametrosCriptograficos {
 	 * El algoritmo a emplear para codificar datos de manera simétrica, empleando
 	 * una única clave.
 	 */
-	public static final String ALGORITMO_SIMETRICO = "AES/CTR/NoPadding"; // Counter es un poco más confidencial que ECB
+	// Uso de ECB con padding para evitar tener que pasar el IV. Comentar esto en la memoria
+	public static final String ALGORITMO_SIMETRICO = "AES/ECB/PKCS7Padding";
 	/**
 	 * El algoritmo para el que generar claves simétricas.
 	 */
@@ -43,4 +44,8 @@ public final class ParametrosCriptograficos {
 	 * ya ha sido registrado con la JCA.
 	 */
 	public static final Provider PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS = new BouncyCastleProvider();
+
+	private ParametrosCriptograficos() {
+		// No permitir instanciar esta clase
+	}
 }

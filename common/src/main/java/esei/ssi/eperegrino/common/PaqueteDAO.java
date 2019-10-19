@@ -14,6 +14,9 @@ import java.util.Base64;
  * @author ribadas
  */
 public final class PaqueteDAO {
+	// Modificaciones menores para trabajar con flujos en lugar de ficheros.
+	// Ello es más flexible y facilita tests unitarios
+
 	public final static String MARCA_CABECERA = "-----";
 	public final static String INICIO_PAQUETE = MARCA_CABECERA + "BEGIN PACKAGE" + MARCA_CABECERA;
 	public final static String FIN_PAQUETE = MARCA_CABECERA + "END PACKAGE" + MARCA_CABECERA;
@@ -31,14 +34,18 @@ public final class PaqueteDAO {
 
 		result = new Paquete();
 
-		while (!linea.equals(INICIO_PAQUETE)) {
+		// Modificado por Alejandro para evitar lanzar NullPointerException
+		// si el paquete no contiene INICIO_PAQUETE
+		while (linea != null && !linea.equals(INICIO_PAQUETE)) {
 			linea = in.readLine();
 		}
 
-		Bloque bloque = leerBloque(in);
-		while (bloque != null) {
-			result.anadirBloque(bloque.getNombre(), bloque.getContenido());
-			bloque = leerBloque(in);
+		if (INICIO_PAQUETE.equals(linea)) {
+			Bloque bloque = leerBloque(in);
+			while (bloque != null) {
+				result.anadirBloque(bloque.getNombre(), bloque.getContenido());
+				bloque = leerBloque(in);
+			}
 		}
 
 		return result;

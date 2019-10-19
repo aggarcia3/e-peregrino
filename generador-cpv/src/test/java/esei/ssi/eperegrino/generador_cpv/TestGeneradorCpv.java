@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import org.junit.After;
 import org.junit.Test;
 
 import esei.ssi.eperegrino.common.Actor;
@@ -61,6 +62,11 @@ public final class TestGeneradorCpv {
 		// Generar claves aleatorias para probar los casos de uso
 		clavePublicaOficinaPeregrino = generadorClaves.generateKeyPair().getPublic().getEncoded();
 		clavePrivadaPeregrino = generadorClaves.generateKeyPair().getPrivate().getEncoded();
+	}
+
+	@After
+	public void restaurarFlujos() {
+		bos.reset();
 	}
 
 	/**

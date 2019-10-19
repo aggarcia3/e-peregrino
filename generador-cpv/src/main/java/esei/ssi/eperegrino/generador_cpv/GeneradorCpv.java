@@ -28,6 +28,9 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import static esei.ssi.eperegrino.common.Util.pedirFichero;
+import static esei.ssi.eperegrino.common.NombresBloques.TITULO_BLOQUE_DATOS_PEREGRINO;
+import static esei.ssi.eperegrino.common.NombresBloques.TITULO_BLOQUE_CLAVE_DATOS_PEREGRINO;
+import static esei.ssi.eperegrino.common.NombresBloques.TITULO_BLOQUE_RESUMEN_DATOS_PEREGRINO_ENCRIPTADOS;
 
 /**
  * Contiene la lógica de negocio de una aplicación que genera una credencial de
@@ -35,11 +38,7 @@ import static esei.ssi.eperegrino.common.Util.pedirFichero;
  *
  * @author Alejandro González García
  */
-final class GeneradorCpv {
-	public static final String TITULO_BLOQUE_DATOS_PEREGRINO = "DATOS PEREGRINO";
-	public static final String TITULO_BLOQUE_CLAVE_DATOS = "CLAVE DATOS PEREGRINO";
-	public static final String TITULO_BLOQUE_RESUMEN_DATOS_ENCRIPTADO = "DATOS ENCRIPTADOS";
-
+public final class GeneradorCpv {
 	// Argumentos de línea de comandos: <nombre paquete> <ficheros con las claves necesarias>  
 	public static void main(final String[] args) {
 		try {
@@ -124,7 +123,7 @@ final class GeneradorCpv {
 	 *                                  generado del paquete.
 	 * @author Alejandro González García
 	 */
-	static void generarPaqueteCPV(final Map<String, String> datos, final OutputStream flujoSalidaPaquete)
+	public static void generarPaqueteCPV(final Map<String, String> datos, final OutputStream flujoSalidaPaquete)
 			throws GeneralSecurityException, InvalidKeySpecException, IOException
 	{
 		KeyGenerator generadorClaveCifradorSimetrico;
@@ -170,9 +169,9 @@ final class GeneradorCpv {
 		cifradorAsimetrico.init(Cipher.ENCRYPT_MODE, Actor.PEREGRINO.getClavePrivada());
 		try {
 			resumenEncriptadoDatos = cifradorAsimetrico.doFinal(
-					MessageDigest.getInstance(
-							ParametrosCriptograficos.ALGORITMO_RESUMEN, ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS
-					).digest(datosEncriptados)
+				MessageDigest.getInstance(
+					ParametrosCriptograficos.ALGORITMO_RESUMEN, ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS
+				).digest(datosEncriptados)
 			);
 		} catch (final ArrayIndexOutOfBoundsException exc) {
 			throw new GeneralSecurityException("La clave privada del peregrino no tiene longitud suficiente para encriptar los datos requeridos");
@@ -183,8 +182,8 @@ final class GeneradorCpv {
 		// con un cifrador asimétrico de los datos encriptados
 		paqueteCpv = new Paquete();
 		paqueteCpv.anadirBloque(TITULO_BLOQUE_DATOS_PEREGRINO, datosEncriptados);
-		paqueteCpv.anadirBloque(TITULO_BLOQUE_CLAVE_DATOS, claveCifradorEncriptada);
-		paqueteCpv.anadirBloque(TITULO_BLOQUE_RESUMEN_DATOS_ENCRIPTADO, resumenEncriptadoDatos);
+		paqueteCpv.anadirBloque(TITULO_BLOQUE_CLAVE_DATOS_PEREGRINO, claveCifradorEncriptada);
+		paqueteCpv.anadirBloque(TITULO_BLOQUE_RESUMEN_DATOS_PEREGRINO_ENCRIPTADOS, resumenEncriptadoDatos);
 
 		// Finalmente, escribir el paquete al flujo
 		PaqueteDAO.escribirPaquete(flujoSalidaPaquete, paqueteCpv);
