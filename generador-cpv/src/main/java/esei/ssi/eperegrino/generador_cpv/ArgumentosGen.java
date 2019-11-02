@@ -52,7 +52,7 @@ final class ArgumentosGen {
 	}
 
 	/**
-	 * Obtiene el fichero que contiene la clave pública de la oficina
+	 * Obtiene el fichero que contiene la clave pública de la oficina del peregrino.
 	 *
 	 * @return El descrito fichero.
 	 */
