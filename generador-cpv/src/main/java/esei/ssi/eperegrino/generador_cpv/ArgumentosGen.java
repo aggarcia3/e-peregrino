@@ -5,7 +5,7 @@ import java.io.File;
 /**
  * Modela los argumentos de operación del desempaquetador de CPV.
  *
- * @author Alejandro González García
+ * @author Pablo Lama Valencia
  */
 final class ArgumentosGen {
 	private final File ficheroPaquete;
@@ -17,13 +17,10 @@ final class ArgumentosGen {
 	 *
 	 * @param ficheroPaquete               El fichero que contiene la CPV a
 	 *                                     desempaquetar.
-	 * @param ficheroClavePrivadaOficina   El fichero que contiene la clave privada
-	 *                                     de la oficina del peregrino.
-	 * @param ficheroClavePublicaPeregrino El fichero que contiene la clave pública
-	 *                                     del peregrino propietario de la CPV.
-	 * @param albergues                    Una lista de identificadores de albergues
-	 *                                     por los que se piensa que fue sellada la
-	 *                                     CPV, asociados con su clave pública.
+	 * @param ficheroClavePrivadaPeregrino El fichero que contiene la clave privada
+	 *                                     del peregrino.
+	 * @param ficheroClavePublicaOficina   El fichero que contiene la clave pública
+	 *                                     de la oficina.
 	 * @throws IllegalArgumentException Si algún parámetro es nulo.
 	 */
 	public ArgumentosGen(final File ficheroPaquete, final File ficheroClavePrivadaPeregrino, final File ficheroClavePublicaOficina) {
@@ -46,7 +43,7 @@ final class ArgumentosGen {
 	}
 
 	/**
-	 * Obtiene el fichero que contiene la clave privada de la oficina del peregrino.
+	 * Obtiene el fichero que contiene la clave privada del peregrino.
 	 *
 	 * @return El descrito fichero.
 	 */
@@ -55,8 +52,7 @@ final class ArgumentosGen {
 	}
 
 	/**
-	 * Obtiene el fichero que contiene la clave pública del peregrino propietario de
-	 * la CPV.
+	 * Obtiene el fichero que contiene la clave pública de la oficina
 	 *
 	 * @return El descrito fichero.
 	 */

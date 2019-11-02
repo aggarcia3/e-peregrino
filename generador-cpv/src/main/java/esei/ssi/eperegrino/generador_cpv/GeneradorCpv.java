@@ -52,7 +52,6 @@ public final class GeneradorCpv {
 
 			// Pares de datos clave-valor en Map.
 			final Map<String, String> map = new HashMap<>();
-			File ficheroPaqueteCpv;
 
 			Scanner teclado = new Scanner(System.in);
 
