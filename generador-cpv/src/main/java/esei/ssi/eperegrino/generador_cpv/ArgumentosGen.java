@@ -46,7 +46,7 @@ final class ArgumentosGen {
 	}
 
 	/**
-	 * Obtiene el fichero que contiene la clave privada de la oficina del peregrino.
+	 * Obtiene el fichero que contiene la clave privada del peregrino.
 	 *
 	 * @return El descrito fichero.
 	 */
@@ -55,8 +55,7 @@ final class ArgumentosGen {
 	}
 
 	/**
-	 * Obtiene el fichero que contiene la clave pública del peregrino propietario de
-	 * la CPV.
+	 * Obtiene el fichero que contiene la clave pública de la oficina del peregrino.
 	 *
 	 * @return El descrito fichero.
 	 */

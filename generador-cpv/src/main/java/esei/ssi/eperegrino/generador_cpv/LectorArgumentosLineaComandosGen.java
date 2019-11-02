@@ -26,7 +26,9 @@ final class LectorArgumentosLineaComandosGen {
 
 		// Obtener y comprobar que el fichero con la CPV sea aparentemente válido
 		final File ficheroPaquete = new File(args[0]);
-		comprobarFicheroPlausible(ficheroPaquete, "la credencial virtual del peregrino");
+		if (ficheroPaquete.exists()) {
+			System.out.println("El fichero " + ficheroPaquete.getName() + " ya existe, y será reemplazado con la CPV.");
+		}
 
 		// Hacer lo mismo para la clave privada del peregrino y la pública de la oficina
 		final File ficheroPrivadaPeregrino = new File(args[1]);
@@ -45,7 +47,7 @@ final class LectorArgumentosLineaComandosGen {
 	 */
 	private static void mostrarSintaxisYSalir() {
 		System.out.println(
-				"Sintaxis: DesempaquetarCredencial (fichero paquete) (fichero clave privada peregrino) (fichero clave pública oficina)");
+				"Sintaxis: GenerarCredencial (fichero paquete) (fichero clave privada peregrino) (fichero clave pública oficina)");
 		System.exit(1);
 	}
 
