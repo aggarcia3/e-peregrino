@@ -27,7 +27,6 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import static esei.ssi.eperegrino.common.Util.pedirFichero;
 import static esei.ssi.eperegrino.common.NombresBloques.TITULO_BLOQUE_DATOS_PEREGRINO;
 import static esei.ssi.eperegrino.common.NombresBloques.TITULO_BLOQUE_CLAVE_DATOS_PEREGRINO;
 import static esei.ssi.eperegrino.common.NombresBloques.TITULO_BLOQUE_RESUMEN_DATOS_PEREGRINO_ENCRIPTADOS;
@@ -50,8 +49,6 @@ public final class GeneradorCpv {
 
 			// Pares de datos clave-valor en Map.
 			final Map<String, String> map = new HashMap<>();
-			File bytesClavePublicaOficinaPeregrino;
-			File bytesClavePrivadaPeregrino;
 			File ficheroPaqueteCpv;
 
 			Scanner teclado = new Scanner(System.in);
@@ -71,13 +68,12 @@ public final class GeneradorCpv {
 
 			System.out.print("Indique su motivación: ");
 			motivacion = teclado.nextLine();
+                        
+                        final ArgumentosGen argumentos = LectorArgumentosLineaComandosGen.interpretar(args);
 
 			// FIXME: leer de argumentos de línea de comandos en lugar de pedir interactivamente
-			bytesClavePublicaOficinaPeregrino = pedirFichero("Escriba la ruta al fichero con la clave pública de la oficina del peregrino", teclado, System.out, true);
-
-			bytesClavePrivadaPeregrino = pedirFichero("Escriba la ruta al fichero con la clave privada del peregrino", teclado, System.out, true);
-
-			ficheroPaqueteCpv = pedirFichero("Escriba la ruta del fichero a generar, con su nueva credencial", teclado, System.out, false);
+                        Actor.OFICINA_PEREGRINO.setClavePublica(Files.readAllBytes(argumentos.getFicheroClavePublicaOficina().toPath()));
+                        Actor.PEREGRINO.setClavePrivada(Files.readAllBytes(argumentos.getFicheroClavePrivadaPeregrino().toPath()));
 
 			map.put("Nombre", nombre);
 			map.put("DNI", DNI);
@@ -86,11 +82,7 @@ public final class GeneradorCpv {
 			map.put("Lugar de creación", lugar);
 			map.put("Motivación", motivacion);
 
-			// Se le asignan las claves recuperadas a la Oficina del Peregrino y al Peregrino
-			Actor.OFICINA_PEREGRINO.setClavePublica(Files.readAllBytes(bytesClavePublicaOficinaPeregrino.toPath()));
-			Actor.PEREGRINO.setClavePrivada(Files.readAllBytes(bytesClavePrivadaPeregrino.toPath()));
-
-			generarPaqueteCPV(map, new FileOutputStream(ficheroPaqueteCpv));
+			generarPaqueteCPV(map, new FileOutputStream(argumentos.getFicheroPaquete()));
 
 			System.out.println("¡Buen viaje!");
 		} catch (Exception exc) {
