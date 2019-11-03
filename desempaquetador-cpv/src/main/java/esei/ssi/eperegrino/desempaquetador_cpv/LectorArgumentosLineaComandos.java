@@ -32,7 +32,7 @@ final class LectorArgumentosLineaComandos {
 
 		// Empezar leyendo el número de albergues, ya que eso
 		// influye en el número de argumentos necesarios
-		short nAlbergues = 0; // Valor no usado
+		short nAlbergues = 0;
 		try {
 			nAlbergues = Short.parseShort(args[1]);
 			if (nAlbergues < 0) {
@@ -64,8 +64,8 @@ final class LectorArgumentosLineaComandos {
 		// y añadir esa información a una lista
 		final List<Entry<String, byte[]>> listaAlbergues = new ArrayList<>(nAlbergues);
 		for (int i = 0; i < nAlbergues; ++i) {
-			 final String identificadorAlbergue = args[2 + i];
-			 final File ficheroPublicaAlbergue = new File(args[2 + i + 1]);
+			 final String identificadorAlbergue = args[2 * (i + 1)];
+			 final File ficheroPublicaAlbergue = new File(args[2 * (i + 1) + 1]);
 
 			 // Abortar el proceso si algún fichero de clave pública no se puede leer
 			 comprobarFicheroPlausible(ficheroPublicaAlbergue, "la clave pública del albergue \"" + identificadorAlbergue + "\"");
