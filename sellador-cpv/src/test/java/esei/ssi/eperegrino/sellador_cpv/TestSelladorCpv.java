@@ -62,7 +62,7 @@ public final class TestSelladorCpv {
 	static {
 		// Inicializar pares clave-valor
 		datos.put("Nombre", "Alejandro");
-		datos.put("Motivación", "Aprobar");
+		datos.put("Motivo", "Aprobar");
 		datosSello.put("Nombre", "Albergue de prueba");
 		datosSello.put("Incidencias", "Ninguna");
 
