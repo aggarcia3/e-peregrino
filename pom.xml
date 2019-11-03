@@ -64,6 +64,15 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>3.2.1</version>
 
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+
 				<configuration>
 					<filters>
 						<filter>
