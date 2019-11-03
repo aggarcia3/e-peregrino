@@ -9,30 +9,29 @@ import java.io.File;
  */
 final class ArgumentosSell {
 	private final File ficheroPaquete;
-	private final File ficheroIdentificadorAlbergue;
+	private final String identificadorAlbergue;
 	private final File ficheroClavePrivadaAlbergue;
 	private final File ficheroClavePublicaOficina;
 
 	/**
 	 * Crea un objeto de argumentos de operación para el desempaquetador de CPV.
 	 *
-	 * @param ficheroPaquete               El fichero que contiene la CPV a
-	 *                                     desempaquetar.
-	 * @param identificadorAlbergue        El fichero que contiene el identificador
-	 *                                     del albergue.
-	 * @param ficheroClavePrivadaAlbergue  El fichero que contiene la clave privada
-	 *                                     del albergue.
-	 * @param ficheroClavePublicaOficina   El fichero que contiene la clave pública
-	 *                                     de la oficina.
+	 * @param ficheroPaquete              El fichero que contiene la CPV a
+	 *                                    desempaquetar.
+	 * @param identificadorAlbergue       El identificador del albergue.
+	 * @param ficheroClavePrivadaAlbergue El fichero que contiene la clave privada
+	 *                                    del albergue.
+	 * @param ficheroClavePublicaOficina  El fichero que contiene la clave pública
+	 *                                    de la oficina.
 	 * @throws IllegalArgumentException Si algún parámetro es nulo.
 	 */
-	public ArgumentosSell(final File ficheroPaquete, final File identificadorAlbergue, final File ficheroClavePrivadaAlbergue, final File ficheroClavePublicaOficina) {
+	public ArgumentosSell(final File ficheroPaquete, final String identificadorAlbergue, final File ficheroClavePrivadaAlbergue, final File ficheroClavePublicaOficina) {
 		if (ficheroPaquete == null || identificadorAlbergue == null || ficheroClavePrivadaAlbergue == null || ficheroClavePublicaOficina == null) {
 			throw new IllegalArgumentException("Los argumentos no pueden ser nulos");
 		}
 
 		this.ficheroPaquete = ficheroPaquete;
-		this.ficheroIdentificadorAlbergue = identificadorAlbergue;
+		this.identificadorAlbergue = identificadorAlbergue;
 		this.ficheroClavePrivadaAlbergue = ficheroClavePrivadaAlbergue;
 		this.ficheroClavePublicaOficina = ficheroClavePublicaOficina;
 	}
@@ -47,12 +46,12 @@ final class ArgumentosSell {
 	}
 	
 	/**
-	 * Obtiene el fichero que contiene el identificador del albergue.
+	 * Obtiene el identificador del albergue.
 	 *
-	 * @return El descrito fichero.
+	 * @return El descrito identificador.
 	 */
-	public File getFicheroIdentificadorAlbergue() {
-		return ficheroIdentificadorAlbergue;
+	public String getIdentificadorAlbergue() {
+		return identificadorAlbergue;
 	}
 
 	/**

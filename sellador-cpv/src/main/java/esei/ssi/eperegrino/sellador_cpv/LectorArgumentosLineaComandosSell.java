@@ -19,8 +19,8 @@ final class LectorArgumentosLineaComandosSell {
 	 * @return Los descritos argumentos de operación del desempaquetador de CPV.
 	 */
 	public static ArgumentosSell interpretar(final String[] args) {
-		// Como mínimo, siempre necesitaremos 3 argumentos
-		if (args.length < 3) {
+		// Como mínimo, siempre necesitaremos 4 argumentos
+		if (args.length < 4) {
 			mostrarSintaxisYSalir();
 		}
 
@@ -28,9 +28,12 @@ final class LectorArgumentosLineaComandosSell {
 		final File ficheroPaquete = new File(args[0]);
 		comprobarFicheroPlausible(ficheroPaquete, "la credencial virtual del peregrino");
 		
-		// Obtener y comprobar que el fichero con el identificador del abergue
-		final File identificadorAlbergue = new File(args[1]);
-		comprobarFicheroPlausible(ficheroPaquete, "el identificador del albergue");
+		// Comprobar que el identificador del albergue tenga buena pinta
+		final String identificadorAlbergue = args[1];
+		if (identificadorAlbergue.trim().isEmpty()) {
+			System.err.println("El identificador del albergue no puede estar en blanco");
+			System.exit(3);
+		}
 
 		// Hacer lo mismo para la clave privada del peregrino y la pública de la oficina
 		final File ficheroPrivadaPeregrino = new File(args[2]);
@@ -39,7 +42,12 @@ final class LectorArgumentosLineaComandosSell {
 		final File ficheroPublicaOficina = new File(args[3]);
 		comprobarFicheroPlausible(ficheroPublicaOficina, "la clave pública de la oficina");
 
-		return new ArgumentosSell(ficheroPaquete, identificadorAlbergue, ficheroPrivadaPeregrino, ficheroPublicaOficina);
+		return new ArgumentosSell(
+			ficheroPaquete,
+			identificadorAlbergue,
+			ficheroPrivadaPeregrino,
+			ficheroPublicaOficina
+		);
 	}
 
 	/**
@@ -49,7 +57,7 @@ final class LectorArgumentosLineaComandosSell {
 	 */
 	private static void mostrarSintaxisYSalir() {
 		System.out.println(
-				"Sintaxis: DesempaquetarCredencial (fichero paquete) (identificador albergue) (fichero clave privada peregrino) (fichero clave pública oficina)");
+				"Sintaxis: GenerarCredencial (fichero paquete) (identificador albergue) (fichero clave privada peregrino) (fichero clave pública oficina)");
 		System.exit(1);
 	}
 

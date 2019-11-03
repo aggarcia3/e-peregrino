@@ -1,6 +1,7 @@
 package esei.ssi.eperegrino.desempaquetador_cpv;
 
 import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 
 import java.io.ByteArrayInputStream;
@@ -12,9 +13,12 @@ import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import org.junit.After;
@@ -26,6 +30,7 @@ import esei.ssi.eperegrino.common.GestorProveedoresJCA;
 import esei.ssi.eperegrino.common.JSONUtils;
 import esei.ssi.eperegrino.common.ParametrosCriptograficos;
 import esei.ssi.eperegrino.generador_cpv.GeneradorCpv;
+import esei.ssi.eperegrino.sellador_cpv.SelladorCpv;
 
 /**
  * La batería de tests de JUnit a ejecutar sobre la clase DesempaquetadorCpv.
@@ -50,9 +55,21 @@ public final class TestDesempaquetadorCpv {
 	 */
 	private static final byte[] clavePrivadaPeregrino;
 	/**
+	 * La clave pública del albergue, generada aleatoriamente.
+	 */
+	private static final byte[] clavePublicaAlbergue;
+	/**
+	 * La clave privada del albergue, generada aleatoriamente.
+	 */
+	private static final byte[] clavePrivadaAlbergue;
+	/**
 	 * Unos pares de datos clave-valor a probar su conversión.
 	 */
 	private static final Map<String, String> datos = new HashMap<>();
+	/**
+	 * Unos pares de datos clave-valor a probar su conversión.
+	 */
+	private static final Map<String, String> datosSello = new HashMap<>();
 	/**
 	 * Un flujo de salida para recoger los resultados de las pruebas.
 	 */
@@ -69,6 +86,9 @@ public final class TestDesempaquetadorCpv {
 	static {
 		// Inicializar pares clave-valor
 		datos.put("Nombre", "Alejandro");
+		datos.put("Motivación", "Aprobar");
+		datosSello.put("Nombre", "Albergue de prueba");
+		datosSello.put("Incidencias", "Ninguna");
 
 		GestorProveedoresJCA.registrarProveedores();
 
@@ -83,11 +103,14 @@ public final class TestDesempaquetadorCpv {
 		// Generar claves aleatorias para probar los casos de uso
 		final KeyPair parClavesPeregrino = generadorClaves.generateKeyPair();
 		final KeyPair parClavesOficinaPeregrino = generadorClaves.generateKeyPair();
+		final KeyPair parClavesAlbergue = generadorClaves.generateKeyPair();
 
 		clavePublicaPeregrino = parClavesPeregrino.getPublic().getEncoded();
 		clavePrivadaPeregrino = parClavesPeregrino.getPrivate().getEncoded();
 		clavePublicaOficinaPeregrino = parClavesOficinaPeregrino.getPublic().getEncoded();
 		clavePrivadaOficinaPeregrino = parClavesOficinaPeregrino.getPrivate().getEncoded();
+		clavePublicaAlbergue = parClavesAlbergue.getPublic().getEncoded();
+		clavePrivadaAlbergue = parClavesAlbergue.getPrivate().getEncoded();
 	}
 
 	@Before
@@ -102,6 +125,10 @@ public final class TestDesempaquetadorCpv {
 	    bos.reset();
 	}
 
+	/**
+	 * Comprueba que el empaquetado y desempaquetado de una CPV válida y recién
+	 * generada funcione.
+	 */
 	@Test
 	public void testEmpaquetarYDesempaquetarPaqueteCpv() throws Exception {
 		Actor.OFICINA_PEREGRINO.setClavePublica(clavePublicaOficinaPeregrino);
@@ -120,6 +147,44 @@ public final class TestDesempaquetadorCpv {
 		assertThat(
 			stdout.toString(StandardCharsets.UTF_8.displayName()),
 			containsString(JSONUtils.map2json(datos))
+		);
+	}
+
+	/**
+	 * Comprueba que el empaquetado, sellado y desempaquetado de una CPV válida y
+	 * recién generada funcione.
+	 */
+	@Test
+	public void testEmpaquetarSellarYDesempaquetarPaqueteCpv() throws Exception {
+		Actor.OFICINA_PEREGRINO.setClavePublica(clavePublicaOficinaPeregrino);
+		Actor.PEREGRINO.setClavePrivada(clavePrivadaPeregrino);
+
+		GeneradorCpv.generarPaqueteCPV(datos, bos);
+
+		Actor.ALBERGUE.setClavePrivada(clavePrivadaAlbergue);
+
+		final byte[] salidaPaquete = bos.toByteArray();
+		bos.reset();
+
+		SelladorCpv.sellarCpv(datosSello, new ByteArrayInputStream(salidaPaquete), bos, "Albergue de prueba");
+
+		Actor.OFICINA_PEREGRINO.setClavePrivada(clavePrivadaOficinaPeregrino);
+		Actor.PEREGRINO.setClavePublica(clavePublicaPeregrino);
+
+		final List<Entry<String, byte[]>> albergues = new ArrayList<>();
+		albergues.add(new AbstractMap.SimpleImmutableEntry<>("Albergue de prueba", clavePublicaAlbergue));
+
+		DesempaquetadorCpv.desempaquetarPaqueteCPV(
+			new ByteArrayInputStream(bos.toByteArray()),
+			albergues
+		);
+
+		assertThat(
+			stdout.toString(StandardCharsets.UTF_8.displayName()),
+			allOf(
+				containsString(JSONUtils.map2json(datos)),
+				containsString(JSONUtils.map2json(datosSello))
+			)
 		);
 	}
 
@@ -153,6 +218,4 @@ public final class TestDesempaquetadorCpv {
 	public void testDesempaquetarPaqueteCpvParametrosInvalidos() throws GeneralSecurityException, IOException {
 		DesempaquetadorCpv.desempaquetarPaqueteCPV(null, null);
 	}
-
-	// TODO: añadir más tests cuando esté listo el código responsable del sellado
 }

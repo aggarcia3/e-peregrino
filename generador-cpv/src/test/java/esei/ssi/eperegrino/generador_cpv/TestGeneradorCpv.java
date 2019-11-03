@@ -48,6 +48,7 @@ public final class TestGeneradorCpv {
 	static {
 		// Inicializar pares clave-valor
 		datos.put("Nombre", "Alejandro");
+		datos.put("Motivación", "Aprobar");
 
 		GestorProveedoresJCA.registrarProveedores();
 

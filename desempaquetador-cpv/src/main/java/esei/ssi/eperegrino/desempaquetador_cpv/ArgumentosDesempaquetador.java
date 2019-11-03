@@ -14,7 +14,7 @@ final class ArgumentosDesempaquetador {
 	private final File ficheroPaquete;
 	private final File ficheroClavePrivadaOficina;
 	private final File ficheroClavePublicaPeregrino;
-	private final List<Entry<String, File>> albergues;
+	private final List<Entry<String, byte[]>> albergues;
 
 	/**
 	 * Crea un objeto de argumentos de operación para el desempaquetador de CPV.
@@ -30,7 +30,7 @@ final class ArgumentosDesempaquetador {
 	 *                                     CPV, asociados con su clave pública.
 	 * @throws IllegalArgumentException Si algún parámetro es nulo.
 	 */
-	public ArgumentosDesempaquetador(final File ficheroPaquete, final File ficheroClavePrivadaOficina, final File ficheroClavePublicaPeregrino, final List<Entry<String, File>> albergues) {
+	public ArgumentosDesempaquetador(final File ficheroPaquete, final File ficheroClavePrivadaOficina, final File ficheroClavePublicaPeregrino, final List<Entry<String, byte[]>> albergues) {
 		if (ficheroPaquete == null || ficheroClavePrivadaOficina == null || ficheroClavePublicaPeregrino == null || albergues == null) {
 			throw new IllegalArgumentException("Los argumentos del desempaquetador de CPV no pueden ser nulos");
 		}
@@ -75,7 +75,7 @@ final class ArgumentosDesempaquetador {
 	 *
 	 * @return La lista descrita. No se garantiza que sea una lista modificable.
 	 */
-	public List<Entry<String, File>> getAlbergues() {
+	public List<Entry<String, byte[]>> getAlbergues() {
 		return albergues;
 	}
 }
