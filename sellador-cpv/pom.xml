@@ -20,6 +20,12 @@
 			<artifactId>common</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>esei.ssi.eperegrino</groupId>
+			<artifactId>generador_cpv</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

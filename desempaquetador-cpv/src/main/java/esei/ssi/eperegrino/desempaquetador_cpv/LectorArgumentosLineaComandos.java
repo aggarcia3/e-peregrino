@@ -1,6 +1,8 @@
 package esei.ssi.eperegrino.desempaquetador_cpv;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -60,7 +62,7 @@ final class LectorArgumentosLineaComandos {
 
 		// Para cada albergue, leer su identificador y clave pública,
 		// y añadir esa información a una lista
-		final List<Entry<String, File>> listaAlbergues = new ArrayList<>(nAlbergues);
+		final List<Entry<String, byte[]>> listaAlbergues = new ArrayList<>(nAlbergues);
 		for (int i = 0; i < nAlbergues; ++i) {
 			 final String identificadorAlbergue = args[2 + i];
 			 final File ficheroPublicaAlbergue = new File(args[2 + i + 1]);
@@ -68,7 +70,13 @@ final class LectorArgumentosLineaComandos {
 			 // Abortar el proceso si algún fichero de clave pública no se puede leer
 			 comprobarFicheroPlausible(ficheroPublicaAlbergue, "la clave pública del albergue \"" + identificadorAlbergue + "\"");
 
-			 listaAlbergues.add(new SimpleImmutableEntry<>(identificadorAlbergue, ficheroPublicaAlbergue));
+			 try {
+				listaAlbergues.add(new SimpleImmutableEntry<>(identificadorAlbergue, Files.readAllBytes(ficheroPublicaAlbergue.toPath())));
+			} catch (final IOException exc) {
+				System.err.println("Ha ocurrido un error de E/S mientras se leía la clave pública del albergue \"" + identificadorAlbergue + "\"");
+				exc.printStackTrace();
+				System.exit(3);
+			}
 		}
 
 		return new ArgumentosDesempaquetador(ficheroPaquete, ficheroPrivadaOficina, ficheroPublicaPeregrino, listaAlbergues);

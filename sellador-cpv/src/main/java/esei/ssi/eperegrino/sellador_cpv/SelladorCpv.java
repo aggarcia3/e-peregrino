@@ -6,8 +6,6 @@ import static esei.ssi.eperegrino.common.NombresBloques.*;
 import esei.ssi.eperegrino.common.Paquete;
 import esei.ssi.eperegrino.common.PaqueteDAO;
 import esei.ssi.eperegrino.common.ParametrosCriptograficos;
-import static esei.ssi.eperegrino.common.Util.pedirFichero;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,8 +26,10 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-final class SelladorCpv {
-
+/**
+ * @author Pablo Lama Valencia
+ */
+public final class SelladorCpv {
 	public static void main(final String[] args) {
 		try {
 			String nombre;
@@ -40,9 +40,9 @@ final class SelladorCpv {
 
 			// Pares de datos clave-valor en Map.
 			final Map<String, String> map = new HashMap<>();
-			File ficheroPaqueteCpv;
 
-			Scanner teclado = new Scanner(System.in);
+			@SuppressWarnings("resource") // Cerrar System.in no suele ser buena idea
+			final Scanner teclado = new Scanner(System.in);
 
 			// Pedimos los datos por teclado
 			System.out.print("Introduzca el nombre completo del albergue: ");
@@ -57,24 +57,26 @@ final class SelladorCpv {
 			Actor.OFICINA_PEREGRINO.setClavePublica(Files.readAllBytes(argumentos.getFicheroClavePublicaOficina().toPath()));
 			Actor.ALBERGUE.setClavePrivada(Files.readAllBytes(argumentos.getFicheroClavePrivadaAlbergue().toPath()));
 
-			ficheroPaqueteCpv = pedirFichero("Escriba la ruta del fichero a generar, con su nueva credencial", teclado, System.out, false);
-
 			map.put("Nombre", nombre);
 			map.put("Fecha de creación", DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.of("Europe/Madrid")).format(Instant.now()));
 			map.put("Lugar de creación", lugar);
 			map.put("Incidencias", incidencias);
 
-			generarPaqueteCPV(map, new FileInputStream(argumentos.getFicheroPaquete()), new FileOutputStream(argumentos.getFicheroPaquete()), argumentos.getFicheroIdentificadorAlbergue());
+			sellarCpv(
+				map,
+				new FileInputStream(argumentos.getFicheroPaquete()),
+				new FileOutputStream(argumentos.getFicheroPaquete()),
+				argumentos.getIdentificadorAlbergue()
+			);
 
 			System.out.println("Gracias por su colaboración");
-		} catch (Exception exc) {
+		} catch (final Exception exc) {
 			System.err.println("Ha ocurrido un error durante la creación de la credencial");
 			exc.printStackTrace();
 		}
 	}
 
-	public static void generarPaqueteCPV(final Map<String, String> datos, final InputStream flujoEntradaPaquete, final OutputStream flujoSalidaPaquete, File identificadorAlbergue)
-			throws GeneralSecurityException, InvalidKeySpecException, IOException {
+	public static void sellarCpv(final Map<String, String> datos, final InputStream flujoEntradaPaquete, final OutputStream flujoSalidaPaquete, final String identificadorAlbergue) throws GeneralSecurityException, InvalidKeySpecException, IOException {
 		KeyGenerator generadorClaveCifradorSimetrico;
 		SecretKey claveCifrador;
 		Cipher cifradorSimetrico, cifradorAsimetrico;
@@ -121,13 +123,13 @@ final class SelladorCpv {
 			throw new GeneralSecurityException("La clave privada del albergue no tiene longitud suficiente para encriptar los datos requeridos");
 		}
 
-		// Se crea el paquete inicial con 3 bloques: los datos del albergue encriptados con un cifrador
+		// Se lee el paquete inicial, con al menos 3 bloques: los datos del albergue encriptados con un cifrador
 		// simétrico, la clave de los datos encriptada con un cifrador asimétrico, y el resumen encriptado
 		// con un cifrador asimétrico de los datos encriptados
 		paqueteCpv = PaqueteDAO.leerPaquete(flujoEntradaPaquete);
-		paqueteCpv.anadirBloque(TITULO_BLOQUE_DATOS_SELLO_ALBERGUE_PARCIAL + identificadorAlbergue, datosEncriptados);
-		paqueteCpv.anadirBloque(TITULO_BLOQUE_CLAVE_SELLO_ALBERGUE_PARCIAL + identificadorAlbergue, claveCifradorEncriptada);
-		paqueteCpv.anadirBloque(TITULO_BLOQUE_RESUMEN_SELLO_ALBERGUE_ENCRIPTADOS_PARCIAL + identificadorAlbergue, resumenEncriptadoDatos);
+		paqueteCpv.anadirBloque(TITULO_BLOQUE_DATOS_SELLO_ALBERGUE.replace("{ID}", identificadorAlbergue), datosEncriptados);
+		paqueteCpv.anadirBloque(TITULO_BLOQUE_CLAVE_SELLO_ALBERGUE.replace("{ID}", identificadorAlbergue), claveCifradorEncriptada);
+		paqueteCpv.anadirBloque(TITULO_BLOQUE_RESUMEN_SELLO_ALBERGUE_ENCRIPTADOS.replace("{ID}", identificadorAlbergue), resumenEncriptadoDatos);
 
 		// Finalmente, escribir el paquete al flujo
 		PaqueteDAO.escribirPaquete(flujoSalidaPaquete, paqueteCpv);

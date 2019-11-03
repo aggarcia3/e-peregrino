@@ -26,6 +26,12 @@
 			<version>1.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>esei.ssi.eperegrino</groupId>
+			<artifactId>sellador_cpv</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -7,7 +7,6 @@ import esei.ssi.eperegrino.common.JSONUtils;
 import esei.ssi.eperegrino.common.Paquete;
 import esei.ssi.eperegrino.common.PaqueteDAO;
 import esei.ssi.eperegrino.common.ParametrosCriptograficos;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,7 +52,8 @@ public final class GeneradorCpv {
 			// Pares de datos clave-valor en Map.
 			final Map<String, String> map = new HashMap<>();
 
-			Scanner teclado = new Scanner(System.in);
+			@SuppressWarnings("resource") // Cerrar System.in no suele ser buena idea
+			final Scanner teclado = new Scanner(System.in);
 
 			// Pedimos los datos por teclado
 			System.out.print("Introduzca su nombre: ");
@@ -77,8 +77,7 @@ public final class GeneradorCpv {
 			map.put("Nombre", nombre);
 			map.put("DNI", DNI);
 			map.put("Domicilio", domicilio);
-			map.put("Fecha de creación",
-					DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.of("Europe/Madrid")).format(Instant.now()));
+			map.put("Fecha de creación", DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.of("Europe/Madrid")).format(Instant.now()));
 			map.put("Lugar de creación", lugar);
 			map.put("Motivación", motivacion);
 
@@ -125,7 +124,8 @@ public final class GeneradorCpv {
 
 		if (datos == null || flujoSalidaPaquete == null) {
 			throw new IllegalArgumentException(
-					"Un parámetro recibido para generar el paquete de la CPV es nulo, y no debería de serlo");
+				"Un parámetro recibido para generar el paquete de la CPV es nulo, y no debería de serlo"
+			);
 		}
 
 		// Registrar los proveedores JCA que usaremos
@@ -133,19 +133,24 @@ public final class GeneradorCpv {
 
 		// Generar una clave aleatoria para un cifrado simétrico
 		generadorClaveCifradorSimetrico = KeyGenerator.getInstance(
-				ParametrosCriptograficos.ALGORITMO_GENERADOR_CLAVES_SIMETRICO,
-				ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
+			ParametrosCriptograficos.ALGORITMO_GENERADOR_CLAVES_SIMETRICO,
+			ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS
+		);
 		generadorClaveCifradorSimetrico.init(ParametrosCriptograficos.LONGITUD_CLAVE_SIMETRICO);
 		claveCifrador = generadorClaveCifradorSimetrico.generateKey();
 
 		// Inicializar cifrador simétrico
-		cifradorSimetrico = Cipher.getInstance(ParametrosCriptograficos.ALGORITMO_SIMETRICO,
-				ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
+		cifradorSimetrico = Cipher.getInstance(
+			ParametrosCriptograficos.ALGORITMO_SIMETRICO,
+			ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS
+		);
 		cifradorSimetrico.init(Cipher.ENCRYPT_MODE, claveCifrador);
 
 		// Inicializar algoritmo de cifrado asimétrico
-		cifradorAsimetrico = Cipher.getInstance(ParametrosCriptograficos.ALGORITMO_ASIMETRICO,
-				ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS);
+		cifradorAsimetrico = Cipher.getInstance(
+			ParametrosCriptograficos.ALGORITMO_ASIMETRICO,
+			ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS
+		);
 		cifradorAsimetrico.init(Cipher.ENCRYPT_MODE, Actor.OFICINA_PEREGRINO.getClavePublica());
 
 		// Generar la representación encriptada con el cifrador simétrico y la clave
@@ -157,32 +162,28 @@ public final class GeneradorCpv {
 		try {
 			claveCifradorEncriptada = cifradorAsimetrico.doFinal(claveCifrador.getEncoded());
 		} catch (final ArrayIndexOutOfBoundsException exc) {
-			throw new GeneralSecurityException(
-					"La clave pública de la oficina del peregrino no tiene longitud suficiente para encriptar los datos requeridos");
+			throw new GeneralSecurityException("La clave pública de la oficina del peregrino no tiene longitud suficiente para encriptar los datos requeridos");
 		}
 
 		// Encriptar el resumen de los datos encriptados con la clave privada del
-		// peregrino,
-		// usando el cifrador asimétrico. De esta manera garantizamos que fue el
-		// peregrino quien
-		// generó este paquete (firma digital)
+		// peregrino, usando el cifrador asimétrico. De esta manera garantizamos que fue
+		// el peregrino quien generó este paquete (firma digital)
 		cifradorAsimetrico.init(Cipher.ENCRYPT_MODE, Actor.PEREGRINO.getClavePrivada());
 		try {
-			resumenEncriptadoDatos = cifradorAsimetrico
-					.doFinal(MessageDigest
-							.getInstance(ParametrosCriptograficos.ALGORITMO_RESUMEN,
-									ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS)
-							.digest(datosEncriptados));
+			resumenEncriptadoDatos = cifradorAsimetrico.doFinal(
+				MessageDigest.getInstance(
+					ParametrosCriptograficos.ALGORITMO_RESUMEN,
+					ParametrosCriptograficos.PROVEEDOR_ALGORITMOS_CRIPTOGRAFICOS
+				).digest(datosEncriptados)
+			);
 		} catch (final ArrayIndexOutOfBoundsException exc) {
-			throw new GeneralSecurityException(
-					"La clave privada del peregrino no tiene longitud suficiente para encriptar los datos requeridos");
+			throw new GeneralSecurityException("La clave privada del peregrino no tiene longitud suficiente para encriptar los datos requeridos");
 		}
 
 		// Se crea el paquete inicial con 3 bloques: los datos del peregrino encriptados
-		// con un cifrador
-		// simétrico, la clave de los datos encriptada con un cifrador asimétrico, y el
-		// resumen encriptado
-		// con un cifrador asimétrico de los datos encriptados
+		// con un cifrador simétrico, la clave de los datos encriptada con un cifrador
+		// asimétrico, y el resumen encriptado con un cifrador asimétrico de los datos
+		// encriptados
 		paqueteCpv = new Paquete();
 		paqueteCpv.anadirBloque(TITULO_BLOQUE_DATOS_PEREGRINO, datosEncriptados);
 		paqueteCpv.anadirBloque(TITULO_BLOQUE_CLAVE_DATOS_PEREGRINO, claveCifradorEncriptada);

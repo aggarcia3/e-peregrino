@@ -1,6 +1,5 @@
 package esei.ssi.eperegrino.desempaquetador_cpv;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +65,7 @@ final class DesempaquetadorCpv {
 	 *                                  paquete.
 	 * @throws IllegalArgumentException Si algún parámetro es nulo.
 	 */
-	static void desempaquetarPaqueteCPV(final InputStream flujoEntradaPaquete, final List<Entry<String, File>> albergues) throws IOException, GeneralSecurityException {
+	static void desempaquetarPaqueteCPV(final InputStream flujoEntradaPaquete, final List<Entry<String, byte[]>> albergues) throws IOException, GeneralSecurityException {
 		Paquete cpv;
 		Cipher cifradorSimetrico, cifradorAsimetrico;
 		String datosPeregrino;
@@ -139,9 +138,9 @@ final class DesempaquetadorCpv {
 		System.out.println(SEPARADOR_BLOQUES);
 
 		// Ahora repetir similares estrategias para cada albergue
-		for (final Entry<String, File> datosAlbergue : albergues) {
+		for (final Entry<String, byte[]> datosAlbergue : albergues) {
 			final String id = datosAlbergue.getKey();
-			final File ficheroClavePublicaAlbergue = datosAlbergue.getValue();
+			final byte[] clavePublicaAlbergue = datosAlbergue.getValue();
 			String sello;
 
 			// Obtener los datos del albergue y su firma
@@ -171,7 +170,7 @@ final class DesempaquetadorCpv {
 			}
 
 			// Establecer la clave pública del albergue actual
-			Actor.ALBERGUE.setClavePublica(Files.readAllBytes(ficheroClavePublicaAlbergue.toPath()));
+			Actor.ALBERGUE.setClavePublica(clavePublicaAlbergue);
 
 			// Comprobar que el sello coincide con el firmado
 			Util.comprobarValidezFirma(
