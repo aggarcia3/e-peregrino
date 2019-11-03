@@ -56,7 +56,7 @@ final class LectorArgumentosLineaComandosSell {
 	 * finaliza su proceso con el código de salida de error 1.
 	 */
 	private static void mostrarSintaxisYSalir() {
-		System.out.println("Sintaxis: SellarCredencial (fichero paquete) (identificador albergue) (fichero clave privada peregrino) (fichero clave pública oficina)");
+		System.out.println("Sintaxis: SellarCredencial (fichero paquete) (identificador albergue) (fichero clave privada albergue) (fichero clave pública oficina)");
 		System.exit(1);
 	}
 
