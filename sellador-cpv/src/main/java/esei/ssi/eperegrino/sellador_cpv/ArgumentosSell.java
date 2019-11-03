@@ -14,10 +14,10 @@ final class ArgumentosSell {
 	private final File ficheroClavePublicaOficina;
 
 	/**
-	 * Crea un objeto de argumentos de operación para el desempaquetador de CPV.
+	 * Crea un objeto de argumentos de operación para el sellador de CPV.
 	 *
 	 * @param ficheroPaquete              El fichero que contiene la CPV a
-	 *                                    desempaquetar.
+	 *                                    sellar.
 	 * @param identificadorAlbergue       El identificador del albergue.
 	 * @param ficheroClavePrivadaAlbergue El fichero que contiene la clave privada
 	 *                                    del albergue.

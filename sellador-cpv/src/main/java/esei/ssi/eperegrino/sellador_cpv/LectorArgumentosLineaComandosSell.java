@@ -16,7 +16,7 @@ final class LectorArgumentosLineaComandosSell {
 	 *
 	 * @param args Los argumentos de línea de comandos a interpretar, tal cual son
 	 *             pasados al método estático main.
-	 * @return Los descritos argumentos de operación del desempaquetador de CPV.
+	 * @return Los descritos argumentos de operación del sellador de CPV.
 	 */
 	public static ArgumentosSell interpretar(final String[] args) {
 		// Como mínimo, siempre necesitaremos 4 argumentos
