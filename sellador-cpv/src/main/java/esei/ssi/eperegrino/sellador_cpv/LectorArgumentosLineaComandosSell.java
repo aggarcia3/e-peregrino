@@ -33,13 +33,13 @@ final class LectorArgumentosLineaComandosSell {
 		comprobarFicheroPlausible(ficheroPaquete, "el identificador del albergue");
 
 		// Hacer lo mismo para la clave privada del peregrino y la pública de la oficina
-		final File ficheroPrivadaPeregrino = new File(args[2]);
-		comprobarFicheroPlausible(ficheroPrivadaPeregrino, "la clave privada del peregrino");
+		final File ficheroPrivadaAlbergue = new File(args[2]);
+		comprobarFicheroPlausible(ficheroPrivadaAlbergue, "la clave privada del albergue");
 
 		final File ficheroPublicaOficina = new File(args[3]);
 		comprobarFicheroPlausible(ficheroPublicaOficina, "la clave pública de la oficina");
 
-		return new ArgumentosSell(ficheroPaquete, identificadorAlbergue, ficheroPrivadaPeregrino, ficheroPublicaOficina);
+		return new ArgumentosSell(ficheroPaquete, identificadorAlbergue, ficheroPrivadaAlbergue, ficheroPublicaOficina);
 	}
 
 	/**
@@ -49,7 +49,7 @@ final class LectorArgumentosLineaComandosSell {
 	 */
 	private static void mostrarSintaxisYSalir() {
 		System.out.println(
-				"Sintaxis: DesempaquetarCredencial (fichero paquete) (identificador albergue) (fichero clave privada peregrino) (fichero clave pública oficina)");
+				"Sintaxis: DesempaquetarCredencial (fichero paquete) (identificador albergue) (fichero clave privada albergue) (fichero clave pública oficina)");
 		System.exit(1);
 	}
 

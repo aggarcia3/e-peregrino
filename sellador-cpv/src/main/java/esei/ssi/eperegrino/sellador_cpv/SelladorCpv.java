@@ -1,7 +1,6 @@
 package esei.ssi.eperegrino.sellador_cpv;
 
 import esei.ssi.eperegrino.common.Actor;
-import esei.ssi.eperegrino.common.GestorProveedoresJCA;
 import esei.ssi.eperegrino.common.JSONUtils;
 import static esei.ssi.eperegrino.common.NombresBloques.*;
 import esei.ssi.eperegrino.common.Paquete;
@@ -25,8 +24,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
