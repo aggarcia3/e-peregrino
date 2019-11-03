@@ -163,7 +163,7 @@ final class DesempaquetadorCpv {
 			}
 
 			final byte[] resumenDatosSelloEncriptados = cpv.getContenidoBloque(
-				NombresBloques.TITULO_BLOQUE_RESUMEN_SELLO_ALBERGUE_ENCRIPTADOS.replace("{ID}", id)
+				NombresBloques.TITULO_BLOQUE_RESUMEN_SELLO_ALBERGUE_ENCRIPTADO.replace("{ID}", id)
 			);
 			if (resumenDatosSelloEncriptados == null) {
 				throw new NoSuchElementException("CPV mal formada: no contiene un bloque con el resumen de los datos del sello del albergue \"" + id + "\" encriptados");

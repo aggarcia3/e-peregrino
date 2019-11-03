@@ -6,13 +6,15 @@ import static esei.ssi.eperegrino.common.NombresBloques.*;
 import esei.ssi.eperegrino.common.Paquete;
 import esei.ssi.eperegrino.common.PaqueteDAO;
 import esei.ssi.eperegrino.common.ParametrosCriptograficos;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.spec.InvalidKeySpecException;
@@ -62,10 +64,21 @@ public final class SelladorCpv {
 			map.put("Lugar de creación", lugar);
 			map.put("Incidencias", incidencias);
 
+			// Usamos la jerarquía de clases de NIO porque tiene semánticas mejor definidas de
+			// apertura de ficheros, que nos permite evitar que al abrir el fichero para escritura
+			// se trunque su contenido
 			sellarCpv(
 				map,
-				new FileInputStream(argumentos.getFicheroPaquete()),
-				new FileOutputStream(argumentos.getFicheroPaquete()),
+				Channels.newInputStream(
+					FileChannel.open(
+						argumentos.getFicheroPaquete().toPath(), StandardOpenOption.READ
+					)
+				),
+				Channels.newOutputStream(
+					FileChannel.open(
+						argumentos.getFicheroPaquete().toPath(), StandardOpenOption.WRITE
+					)
+				),
 				argumentos.getIdentificadorAlbergue()
 			);
 
@@ -129,7 +142,7 @@ public final class SelladorCpv {
 		paqueteCpv = PaqueteDAO.leerPaquete(flujoEntradaPaquete);
 		paqueteCpv.anadirBloque(TITULO_BLOQUE_DATOS_SELLO_ALBERGUE.replace("{ID}", identificadorAlbergue), datosEncriptados);
 		paqueteCpv.anadirBloque(TITULO_BLOQUE_CLAVE_SELLO_ALBERGUE.replace("{ID}", identificadorAlbergue), claveCifradorEncriptada);
-		paqueteCpv.anadirBloque(TITULO_BLOQUE_RESUMEN_SELLO_ALBERGUE_ENCRIPTADOS.replace("{ID}", identificadorAlbergue), resumenEncriptadoDatos);
+		paqueteCpv.anadirBloque(TITULO_BLOQUE_RESUMEN_SELLO_ALBERGUE_ENCRIPTADO.replace("{ID}", identificadorAlbergue), resumenEncriptadoDatos);
 
 		// Finalmente, escribir el paquete al flujo
 		PaqueteDAO.escribirPaquete(flujoSalidaPaquete, paqueteCpv);
